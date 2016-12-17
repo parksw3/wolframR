@@ -33,8 +33,8 @@ nest <- function(expr, x, n, xname = "x") {
         }
         pexpr <- parse(text = dexpr)
 
-        var <- alist(x = )
-        if(names(var) != xname) names(var) <- xname
+        var <- alist(x = , ... =)
+        if(names(var)[1] != xname) names(var) <- xname
 
         make_function(var, pexpr[[1]], parent.frame())
     }else{
