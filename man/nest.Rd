@@ -19,9 +19,5 @@ f <- nest((x+1)^2, NULL, 3)
 ## using different variable names
 exp3 <- nest(exp(a), NULL, 3, xname = "a")
 
-## parenthesis can make a difference
-frac_right <- nest(1+1/(x), NULL, 4)
-frac_wrong <- nest(1+1/x, NULL, 4)
-
 }
 
