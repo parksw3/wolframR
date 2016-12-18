@@ -33,16 +33,20 @@ nest_base <- function(expr, x, n, xname = "x") {
     eval_base <- try(eval(eval(ssexpr, envir = arg, enclos = parent.frame())), silent = TRUE)
     eval_logi <- ifelse(!is(eval_base, "try-error"), TRUE, FALSE)
 
-    if(!eval_logi & length(as.character(x)) > 1){
-        stop("'x' has to be a single variable.")
+    if(!eval_logi){
+        if (length(as.character(x)) > 1){
+            stop("'x' has to be a single variable.")
+        }else{
+            names(arg_base) <- as.character(x)
+        }
     }
-    names(arg_base) <- as.character(x)
+
 
     for(i in 1:n){
         arg[[1]] <- x <- eval(ssexpr, envir = arg, enclos = parent.frame())
 
         if(eval_logi){
-            res[[i]] <- eval(x)
+            res[[i]] <- arg[[1]] <- eval(x)
         }else{
             res[[i]] <- make_function(arg_base, x, .GlobalEnv)
         }
