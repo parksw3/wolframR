@@ -6,13 +6,6 @@
 ##' @examples
 ##' ## fibonacci sequence
 ##' nest(c(x, x[length(x)] + x[length(x)-1]), c(1, 1), 5)
-##'
-##' ## creating a function
-##' f <- nest((x+1)^2, NULL, 3)
-##'
-##' ## using different variable names
-##' exp3 <- nest(exp(a), NULL, 3, xname = "a")
-##'
 ##' @export
 nest <- function(expr, x, n, xname = "x") {
     sexpr <- substitute(expr)
