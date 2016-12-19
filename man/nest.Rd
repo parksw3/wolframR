@@ -4,7 +4,7 @@
 \alias{nest}
 \title{Nested function calls}
 \usage{
-nest(expr, x, n, xname = "x")
+nest(expr, x, n, m = 1, xname = "x")
 }
 \description{
 Implementation of the Nest function from WolframAlpha language

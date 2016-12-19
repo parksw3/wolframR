@@ -3,5 +3,5 @@
 export(angle_path)
 export(get_expression)
 export(nest)
-export(nest_list)
+export(nest_while)
 importFrom(pryr,make_function)
