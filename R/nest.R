@@ -5,14 +5,14 @@
 ##' @importFrom pryr make_function
 ##' @examples
 ##' ## fibonacci sequence
-##' nest(c(x, x[length(x)] + x[length(x)-1]), c(1, 1), 5)
+##' nest(c(1, 1), c(x[2], x[1] + x[2]), 10)
 ##' @export
-nest <- function(expr, x, n, m = 1, xname = "x") {
+nest <- function(x, expr, n, m = 1, xname = "x") {
     if(n < 2 || n %% 1 != 0){
         stop("'n' needs to be an integer greater than 1")
     }
     x <- substitute(x)
-    expr <- get_expression(substitute(expr), xname)
+    expr <- test_expression(substitute(expr), xname)
     ssexpr <- substitute(substitute(expr))
     res <- vector("list", n)
     arg_base <- arg <- alist(x = )
@@ -36,6 +36,7 @@ nest <- function(expr, x, n, m = 1, xname = "x") {
         if(eval_logi){
             res[[i]] <- arg[[1]] <- eval(x)
         }else{
+            ## TODO: allow for additional arguments
             res[[i]] <- make_function(arg_base, x, .GlobalEnv)
         }
     }
@@ -55,25 +56,33 @@ nest <- function(expr, x, n, m = 1, xname = "x") {
 ##'
 ##' @examples
 ##' ## collatz sequence
-##' nest_while(c(x, ifelse(x[length(x)] %% 2 == 0, x[length(x)]/2, 3*x[length(x)]+1)), 1214, x[length(x)] != 1)
+##' nest_while(1214, ifelse(x %% 2 == 0, x/2, 3*x+1), x != 1)
+##' nest_while(c(3249, 2723, 4901), ifelse(x %% 2 == 0, x/2, ifelse(x == 1, 1, 3*x+1)), any(x != 1))
 ##' @export
-nest_while <- function(expr, x, cond, m = 1, max = NA, n = 0, xname = "x"){
+nest_while <- function(x, expr, cond, m = 1, max = NA, n = 0, xname = "x"){
     sexpr <- substitute(expr)
-    expr <- get_expression(sexpr)
+    expr <- test_expression(sexpr)
     scond <- substitute(cond)
-    cond <- get_expression(scond, varname = "'cond'")
+    cond <- test_expression(scond, varname = "'cond'")
     cond_base <- try(eval(cond, envir = list(x = x), enclos = parent.frame()), silent = TRUE)
-    if(is(eval_base, "try-error"))
-        stop(gettextf("'cond  cannot be evaluated at '%s'.", x), domain = NA)
+    if(is(cond_base, "try-error"))
+        stop(paste0("'cond' cannot be evaluated at ", substitute(x), "."), domain = NA)
 
     if(!is.logical(cond_base))
         stop("'cond' must return TRUE/FALSE.")
 
-    res <- vector("list", 100)
+    res <- res_base <- vector("list", 100)
     i <- 1
+    res[[1]] <- x
 
     while(eval(cond, envir = list(x = x), enclos = parent.frame())){
-        x <- eval(expr, envir = list(x = x), enclos = parent.frame())
+        i <- i + 1
+        res[[i]] <- x <- eval(expr, envir = list(x = x), enclos = parent.frame())
+        if(i >= length(res)){
+            res <- append(res, res_base)
+        }
     }
-    x
+    ## TODO: work on m, max, and n...
+    ## also write test_vector...
+    res[1:i]
 }

@@ -4,7 +4,8 @@
 \alias{angle_path}
 \title{Draw angle path plots}
 \usage{
-angle_path(theta, length = 1, start = c(0, 0), deg = FALSE, ...)
+angle_path(theta, length = 1, start = c(0, 0), deg = FALSE, plot = TRUE,
+  ...)
 }
 \arguments{
 \item{theta}{a vector representing angles}
@@ -16,7 +17,7 @@ Draw angle path plots
 }
 \examples{
 angle_path(seq(0, 10, 0.01))
-angle_path(c(90, -90)[1 + nest(c(x, 0, rev(1-x)), 0, 10)], deg = TRUE)
+angle_path(c(90, -90)[1 + nest(0, c(x, 0, rev(1-x)), 10)], deg = TRUE)
 }
 \seealso{
 \code{\link{nest}}

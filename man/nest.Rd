@@ -4,13 +4,13 @@
 \alias{nest}
 \title{Nested function calls}
 \usage{
-nest(expr, x, n, m = 1, xname = "x")
+nest(x, expr, n, m = 1, xname = "x")
 }
 \description{
 Implementation of the Nest function from WolframAlpha language
 }
 \examples{
 ## fibonacci sequence
-nest(c(x, x[length(x)] + x[length(x)-1]), c(1, 1), 5)
+nest(c(1, 1), c(x[2], x[1] + x[2]), 10)
 }
 
