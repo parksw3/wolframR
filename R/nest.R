@@ -49,7 +49,11 @@ nest <- function(x, expr, n, m = 1, xname = "x") {
     if(m == "all" | m > n)
         m <- n
 
-    return(res[(n-m+1):n])
+    if(m == 1){
+        return(res[[n]])
+    }else{
+        return(res[(n-m+1):n])
+    }
 }
 
 ##' repeat until the condition is met
