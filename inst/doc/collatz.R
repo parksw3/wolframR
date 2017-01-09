@@ -4,7 +4,7 @@ library(ggplot2); theme_set(theme_classic())
 library(plyr)
 library(dplyr)
 
-## ----collatz, cache = TRUE, fig.width = 4, fig.height = 4, dpi = 300-----
+## ----collatz, fig.width = 4, fig.height = 4, dpi = 300-------------------
 set.seed(101)
 n <- sample(1e7, 2000)
 
@@ -16,7 +16,7 @@ collatz_test <- function(x){
 }
 
 collatz_seq <- n %>%
-    nest_while(collatz_test, any(!is.na(x)))
+    nest_while(collatz_test, any(!is.na(x)), m = "all")
 
 collatz_list <- do.call("rbind", collatz_seq) %>%
     split(rep(1:ncol(.), each = nrow(.))) %>%
@@ -40,7 +40,7 @@ collatz_angle <- collatz_list %>%
 ggplot(collatz_angle, aes(x, y, group = run)) +
     geom_path(alpha = 0.04)
 
-## ----fancy_collatz, cache = TRUE, fig.width = 4, fig.height= 4, dpi = 300----
+## ----fancy_collatz, fig.width = 4, fig.height= 4, dpi = 300--------------
 collatz_angle2 <- collatz_list %>%
     lapply(function(x){
         data.frame(level = 1/length(x) * 0:length(x))

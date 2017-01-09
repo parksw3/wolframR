@@ -1,4 +1,4 @@
-##' Nested function calls
+##' apply function recursively
 ##'
 ##' Implementation of the Nest function from WolframAlpha language
 ##'
@@ -7,37 +7,39 @@
 ##' ## fibonacci sequence
 ##' nest(c(1, 1), c(x[2], x[1] + x[2]), 10)
 ##' @export
-nest <- function(x, expr, n, m = 1, xname = "x") {
-    if(n < 2 || n %% 1 != 0){
-        stop("'n' needs to be an integer greater than 1")
-    }
-    x <- substitute(x)
+nest <- function(x, expr, n, m = 1, xname = "x", ...) {
+    if(n < 1 | n %% 1 != 0)
+        stop("'n' must be a positive integer.")
+
+    .x <- substitute(x)
     expr <- test_expression(substitute(expr), xname)
     ssexpr <- substitute(substitute(expr))
     res <- vector("list", n)
     arg_base <- arg <- alist(x = )
     if(xname != "x") names(arg) <- xname
 
-    arg[[1]] <- x
-    eval_base <- try(eval(eval(ssexpr, envir = arg, enclos = parent.frame())), silent = TRUE)
+    arg[[1]] <- .x
+
+    eval_base <- try(eval(eval(ssexpr, envir = append(arg, list(...)), enclos = parent.frame())), silent = TRUE)
     eval_logi <- !is(eval_base, "try-error")
 
     if(!eval_logi){
-        if (length(as.character(x)) > 1){
+        if (length(as.character(.x)) > 1){
             stop("'x' has to be a single variable.")
         }else{
-            names(arg_base) <- as.character(x)
+            names(arg_base)[1] <- as.character(.x)
         }
+        arg_base <- append(arg_base, list(...))
+    }else{
+        arg <- append(arg, list(...))
     }
-
     for(i in 1:n){
-        arg[[1]] <- x <- eval(ssexpr, envir = arg, enclos = parent.frame())
+        arg[[1]] <- .x <- eval(ssexpr, envir = arg, enclos = parent.frame())
 
         if(eval_logi){
-            res[[i]] <- arg[[1]] <- eval(x)
+            res[[i]] <- arg[[1]] <- eval(.x)
         }else{
-            ## TODO: allow for additional arguments
-            res[[i]] <- make_function(arg_base, x, .GlobalEnv)
+            res[[i]] <- make_function(arg_base, .x, .GlobalEnv)
         }
     }
 
@@ -46,24 +48,26 @@ nest <- function(x, expr, n, m = 1, xname = "x") {
     if(all(v == 1) & is.vector(res[[1]]))
         res <- unlist(res)
 
+    if(m == 1)
+        return(res[[n]])
+
     if(m == "all" | m > n)
         m <- n
 
-    if(m == 1){
-        return(res[[n]])
-    }else{
-        return(res[(n-m+1):n])
-    }
+    return(res[(n-m+1):n])
 }
 
 ##' repeat until the condition is met
 ##'
 ##' @examples
+##' ## taylor expansion
+##' nest_while(0, x+1, exp(1) - sum(1/factorial(0:x)) > 1e-5)
+##'
 ##' ## collatz sequence
-##' nest_while(1214, ifelse(x %% 2 == 0, x/2, 3*x+1), x != 1)
-##' nest_while(c(3249, 2723, 4901), ifelse(x %% 2 == 0, x/2, ifelse(x == 1, 1, 3*x+1)), any(x != 1))
+##' nest_while(1214, ifelse(x %% 2 == 0, x/2, 3*x+1), x != 1, m = "all")
+##' nest_while(c(3249, 2723, 4901), ifelse(x %% 2 == 0, x/2, ifelse(x == 1, 1, 3*x+1)), any(x != 1), m = "all")
 ##' @export
-nest_while <- function(x, expr, cond, m = 1, max = NA, n = 0, xname = "x"){
+nest_while <- function(x, expr, cond, m = 1, maxit = 1e5, n = 0, xname = "x", ...){
     sexpr <- substitute(expr)
     expr <- test_expression(sexpr)
     scond <- substitute(cond)
@@ -79,14 +83,35 @@ nest_while <- function(x, expr, cond, m = 1, max = NA, n = 0, xname = "x"){
     i <- 1
     res[[1]] <- x
 
-    while(eval(cond, envir = list(x = x), enclos = parent.frame())){
+    arg <- list(x = x, ...)
+
+    while(i < maxit & eval(cond, envir = arg, enclos = parent.frame())){
         i <- i + 1
-        res[[i]] <- x <- eval(expr, envir = list(x = x), enclos = parent.frame())
+        res[[i]] <- arg[[1]] <- eval(expr, envir = arg, enclos = parent.frame())
         if(i >= length(res)){
             res <- append(res, res_base)
         }
     }
-    ## TODO: work on m, max, and n...
-    ## also write test_vector...
-    res[1:i]
+    if(n > 0){
+        for(j in 1:n){
+            i <- i + 1
+            res[[i]] <- arg[[1]] <- eval(expr, envir = arg, enclos = parent.frame())
+            if(i >= length(res)){
+                res <- append(res, res_base)
+            }
+        }
+    }
+
+    v <- unlist(lapply(res, length)); v <- v[v > 0]
+
+    if(all(v == 1) & is.vector(res[[1]]))
+        res <- unlist(res)
+
+    if(m == 1){
+        return(res[[i]])
+    }else if(m == "all" | m > i){
+        m <- i
+    }
+
+    return(res[(i-m+1):i])
 }
