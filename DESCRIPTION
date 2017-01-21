@@ -1,10 +1,10 @@
 Package: wolframR
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Wolfram Alpha functions
 Version: 0.1.0
 Author: Sang Woo Park
 Maintainer: Sang Woo Park <parksw3@mcmaster.ca>
-Description: More about what it does (maybe more than one line)
+Description: Implementation of some Wolfram Alpha functions in R
 VignetteBuilder: knitr
 LazyData: TRUE
 Imports:

@@ -8,15 +8,30 @@ angle_path(theta, length = 1, start = c(0, 0), deg = FALSE, plot = TRUE,
   ...)
 }
 \arguments{
-\item{theta}{a vector representing angles}
+\item{theta}{a numeric vector containing angle at each step.}
 
-\item{length}{a vector representing lenghths of each segment}
+\item{length}{a numeric vector containing lenghths of each segment.}
+
+\item{start}{a numeric vector containing starting poistion.}
+
+\item{deg}{a logical indicating whether degree should be used instead of radian.}
+
+\item{...}{additional arguments to be passed to \code{plot}.}
 }
 \description{
 Draw angle path plots
 }
 \examples{
+## Some of these examples are directly taken from the Wolfram Alpha documentation
+
 angle_path(seq(0, 10, 0.01))
+
+angle_path(c(30, 50, -40), c(3, 2, 1), deg = TRUE)
+
+## Make arandom walk where successive change direction by at most 20 degrees
+angle_path(runif(1000, min = -20, max = 20), deg = TRUE)
+
+## Dragon curve
 angle_path(c(90, -90)[1 + nest(0, c(x, 0, rev(1-x)), 10)], deg = TRUE)
 }
 \seealso{
