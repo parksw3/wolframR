@@ -1,18 +1,18 @@
 ##' Apply a function recursively
 ##'
-##' Implementation of the \code{Nest} function from Wolfram Alpha.
-##' Order of arguments have been changed so that it is compatible with the pipe operator (see \code{\link[magrittr]{\%>\%}}).
+##' Implementation of the \code{Nest} function from the Wolfram language.
+##' Syntax order has been changed so that the function is compatible with the pipe operator (see \code{\link[magrittr]{\%>\%}}).
 ##'
 ##' @importFrom pryr make_function
 ##' @param x an object or a variable name.
 ##' @param expr an expression or a function to be evaluated recursively.
 ##' @param n number of iterations.
 ##' @param m return results of the last \code{m} iterations. Setting \code{m = "all"} returns a list of all results.
-##' This is equivalent to \code{NestList} function from WolframAlpha.
+##' This is equivalent to \code{NestList} function from the Wolfram language.
 ##' @param xname character string containing the name of the argument that will be used recursively.
 ##' @return a list or a vector of length \code{m} containing the results or a function; list of functions will be returned if \code{m > 1}.
 ##' @examples
-##' ## Some of these examples are directly taken from the Wolfram Alpha documentation
+##' ## Some of these examples are directly taken from the Wolfram documentation
 ##'
 ##' ## Newton iterations for \sqrt{2}
 ##' nest(1, (x + 2/x)/2, 5)
@@ -26,7 +26,7 @@
 ##' ## Multi-log transformation
 ##' multi_log <- nest(x, log(x + 1), 4)
 ##'
-##' ## Changing xname can imitate the use of \code{#}
+##' ## Changing xname can imitate the use of '#' in the Wolfram language
 ##' ## Both codes return a function. How are they different?
 ##' f1 <- nest(x, x^y, 4, xname = "y")
 ##' f2 <- nest(x, y^x, 4, xname = "y")
@@ -81,18 +81,18 @@ nest <- function(x, expr, n, m = 1, xname = "x") {
 
 ##' Apply a function recursively until the condition is satisfied
 ##'
-##' Implementation of the \code{NestWhile} function from Wolfram Alpha.
-##' Order of arguments have been changed so that it is compatible with the pipe operator (see \code{\link[magrittr]{\%>\%}}).
+##' Implementation of the \code{NestWhile} function from the Wolfram langauge.
+##' Syntax order has been changed so that the function is compatible with the pipe operator (see \code{\link[magrittr]{\%>\%}}).
 ##' @param x an object or a variable name.
 ##' @param expr an expression or a function to be evaluated recursively.
 ##' @param cond a condition to be evaluated.
 ##' @param m return results of the last \code{m} iterations. Setting \code{m = "all"} returns a list of all results;
-##' This is equivalent to \code{NestWhileList} function from WolframAlpha.
+##' This is equivalent to \code{NestWhileList} function from the Wolfram language.
 ##' @param maxit maximum number of iterations.
 ##' @param n additional iterations to be completed after the condition has been satisfied.
 ##' @param xname character string containing the name of the argument that will be used recursively.
 ##' @examples
-##' ## Some of these examples are directly taken from the Wolfram Alpha documentation
+##' ## Some of these examples are directly taken from the Wolfram documentation
 ##'
 ##' ## number of terms required in taylor expansion to achieve a target error.
 ##' nest_while(0, x+1, exp(1) - sum(1/factorial(0:x)) > 1e-5)
@@ -100,10 +100,15 @@ nest <- function(x, expr, n, m = 1, xname = "x") {
 ##' ## collatz sequence
 ##' nest_while(1214, ifelse(x %% 2 == 0, x/2, 3*x+1), x != 1, m = "all")
 ##'
+##' ## root finding algorithms
+##' f <- function(x) x^5 - 4 * x^3 + 159
+##' secant <- function(x) c(x[2], x[2] - f(x[2]) * diff(x)/diff(f(x)))
+##' nest_while(c(2, 3), secant, abs(f(x[2])) > 10^-5)
+##'
 ##' ## Happy number
 ##' ## http://stackoverflow.com/questions/18675285/digit-sum-function-in-r
 ##' digitsum2 <- function(x) sum((floor(x / 10^(0:(nchar(x) - 1))) %% 10)^2)
-##' res <- sapply(1:1000, function(x) nest_while(x, digitsum2, x >= 10, n = 6))
+##' res <- sapply(1:1000, function(x) nest_while(x, digitsum2, x!= 1 & x!= 4))
 ##' which(res == 1)
 ##'
 ##' @export
